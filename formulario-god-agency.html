@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Llamada de diagnóstico — GOD Agency</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 60px;
+  }
+  .wrap { width: 100%; max-width: 520px; }
+  .logo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+  .logo-icon { width: 40px; height: 40px; background: #FF5C00; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+  .logo-name { font-size: 15px; font-weight: 600; color: #fff; }
+  .logo-sub { font-size: 12px; color: #888; margin-top: 1px; }
+  .prog-wrap { height: 3px; background: #222; border-radius: 2px; margin-bottom: 10px; }
+  .prog-fill { height: 3px; background: #FF5C00; border-radius: 2px; transition: width .35s; }
+  .step-lbl { font-size: 12px; color: #666; margin-bottom: 24px; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .q-label { font-size: 11px; font-weight: 600; color: #FF5C00; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .q-title { font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 20px; line-height: 1.45; }
+  .opt { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1px solid #222; border-radius: 10px; margin-bottom: 9px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .opt:hover { border-color: #444; background: #111; }
+  .opt.selected { border-color: #FF5C00; background: rgba(255,92,0,.08); }
+  .radio { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #444; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .opt.selected .radio { border-color: #FF5C00; background: #FF5C00; }
+  .opt.selected .radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+  .opt-text { font-size: 14px; color: #ddd; line-height: 1.4; }
+  .opt.selected .opt-text { color: #fff; }
+  .btn { background: #FF5C00; color: white; border: none; border-radius: 10px; padding: 14px 24px; font-size: 15px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 16px; transition: background .15s; }
+  .btn:hover { background: #e05200; }
+  .btn:disabled { background: #222; color: #555; cursor: not-allowed; }
+  textarea, input[type=text], input[type=email], input[type=tel] {
+    width: 100%; padding: 12px 14px; border: 1px solid #222; border-radius: 10px;
+    font-size: 14px; color: #f0f0f0; background: #111; margin-bottom: 10px;
+    font-family: inherit; transition: border-color .15s;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+  input:focus, textarea:focus { outline: none; border-color: #FF5C00; }
+  input::placeholder, textarea::placeholder { color: #444; }
+  .invest-box { background: rgba(255,92,0,.07); border: 1px solid rgba(255,92,0,.2); border-radius: 10px; padding: 16px 18px; margin-bottom: 20px; font-size: 13px; color: #aaa; line-height: 1.75; }
+  .invest-box strong { color: #FF5C00; }
+  .card-end { border: 1px solid #1e1e1e; border-radius: 16px; padding: 32px 24px; text-align: center; background: #111; }
+  .card-end .icon { font-size: 42px; margin-bottom: 16px; display: block; }
+  .card-end h2 { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+  .card-end p { font-size: 13px; color: #888; line-height: 1.7; margin-bottom: 22px; }
+  .card-end p strong { color: #ddd; }
+  .cal-btn { display: inline-flex; align-items: center; gap: 8px; background: #FF5C00; color: white; padding: 14px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; text-decoration: none; transition: background .15s; }
+  .cal-btn:hover { background: #e05200; }
+  .cal-btn-sub { font-size: 11px; color: #555; margin-top: 12px; }
+  .no-btn { display: inline-block; background: transparent; color: #FF5C00; border: 1px solid #FF5C00; padding: 12px 26px; border-radius: 10px; font-size: 13px; font-weight: 500; text-decoration: none; transition: all .15s; }
+  .no-btn:hover { background: rgba(255,92,0,.1); }
+  @media (max-width: 480px) {
+    body { padding: 24px 16px 48px; }
+    .q-title { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo-row">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div class="logo-name">GOD Agency</div>
+      <div class="logo-sub">Llamada de diagnóstico gratuita · 30 min</div>
+    </div>
+  </div>
+
+  <div class="prog-wrap"><div class="prog-fill" id="pbar" style="width:20%"></div></div>
+  <p class="step-lbl" id="slbl">Paso 1 de 5</p>
+
+  <!-- PASO 1 -->
+  <div id="s1" class="step active">
+    <p class="q-label">Tu negocio</p>
+    <p class="q-title">¿Cómo describirías tu negocio?</p>
+    <div class="opt" onclick="pick(this,'s1')"><div class="radio"></div><span class="opt-text">Inmobiliaria / agencia</span></div>
+    <div class="opt" onclick="pick(this,'s1')"><div class="radio"></div><span class="opt-text">Desarrolladora / constructora</span></div>
+    <div class="opt" onclick="pick(this,'s1')"><div class="radio"></div><span class="opt-text">Agente independiente</span></div>
+    <div class="opt" onclick="pick(this,'s1')"><div class="radio"></div><span class="opt-text">Otro rubro</span></div>
+    <button class="btn" id="b1" disabled onclick="advance(1)">Continuar →</button>
+  </div>
+
+  <!-- PASO 2 -->
+  <div id="s2" class="step">
+    <p class="q-label">Situación actual</p>
+    <p class="q-title">¿Estás haciendo marketing digital actualmente?</p>
+    <div class="opt" onclick="pick(this,'s2')"><div class="radio"></div><span class="opt-text">No, nunca lo hice</span></div>
+    <div class="opt" onclick="pick(this,'s2')"><div class="radio"></div><span class="opt-text">Sí, pero no me está dando resultados</span></div>
+    <div class="opt" onclick="pick(this,'s2')"><div class="radio"></div><span class="opt-text">Sí, y quiero escalar</span></div>
+    <button class="btn" id="b2" disabled onclick="advance(2)">Continuar →</button>
+  </div>
+
+  <!-- PASO 3 -->
+  <div id="s3" class="step">
+    <p class="q-label">Tu desafío</p>
+    <p class="q-title">¿Cuál es tu principal desafío ahora mismo?</p>
+    <textarea id="challenge" placeholder="Ej: No me llegan leads de calidad, gasto en Meta Ads y no convierte..." oninput="document.getElementById('b3').disabled=this.value.trim().length<10"></textarea>
+    <button class="btn" id="b3" disabled onclick="advance(3)">Continuar →</button>
+  </div>
+
+  <!-- PASO 4 -->
+  <div id="s4" class="step">
+    <p class="q-label">Inversión mínima</p>
+    <p class="q-title">Una pregunta importante antes de seguir</p>
+    <div class="invest-box">
+      En GOD Agency trabajamos con un número limitado de clientes para garantizar resultados. Nuestro servicio base tiene una inversión desde <strong>U$D 800/mes</strong>.<br><br>
+      Para valorar tu tiempo y el nuestro: ¿estás en posición de invertir ese monto en marketing digital para tu negocio?
+    </div>
+    <div class="opt" onclick="pick(this,'s4','si')"><div class="radio"></div><span class="opt-text">Sí, estoy listo para invertir</span></div>
+    <div class="opt" onclick="pick(this,'s4','no')"><div class="radio"></div><span class="opt-text">No por ahora</span></div>
+    <button class="btn" id="b4" disabled onclick="advance(4)">Continuar →</button>
+  </div>
+
+  <!-- PASO 5 -->
+  <div id="s5" class="step">
+    <p class="q-label">Tus datos</p>
+    <p class="q-title">Casi listo — ¿a quién le agendamos la llamada?</p>
+    <input type="text" id="fname" placeholder="Nombre y apellido" oninput="chkContact()">
+    <input type="email" id="femail" placeholder="Email" oninput="chkContact()">
+    <input type="tel" id="fphone" placeholder="WhatsApp (ej: +54 9 341...)" oninput="chkContact()">
+    <button class="btn" id="b5" disabled onclick="goCalendar()">Ver horarios disponibles →</button>
+  </div>
+
+  <!-- DESCARTE -->
+  <div id="s-no" class="step">
+    <div class="card-end">
+      <span class="icon">🙏</span>
+      <h2>¡Gracias por tu interés!</h2>
+      <p>Por el momento nuestros servicios pueden no ser el fit ideal para tu etapa actual. Si buscás herramientas para gestionar el marketing de tu negocio inmobiliario de forma autónoma, <strong>RealtorPro</strong> puede ayudarte.</p>
+      <a href="https://apprealtorpro.com" class="no-btn">Conocer RealtorPro →</a>
+    </div>
+  </div>
+
+  <!-- ÉXITO → CAL.COM -->
+  <div id="s-ok" class="step">
+    <div class="card-end">
+      <span class="icon">✅</span>
+      <h2 id="ok-title">¡Listo!</h2>
+      <p>Calificaste para una llamada de diagnóstico con GOD Agency. Ahora elegí el día y horario que mejor te quede — el turno queda confirmado automáticamente.</p>
+      <a id="cal-link" href="https://cal.com/matias-gironelli-calendario/llamada-de-diagnostico-god-agency" target="_blank" class="cal-btn">
+        📅 Elegir mi horario →
+      </a>
+      <p class="cal-btn-sub">Se abre en una nueva pestaña. La confirmación llega por email.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ans = {};
+
+function show(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setProgress(n) {
+  const pct = Math.round((n / 5) * 100);
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('slbl').textContent = n <= 5 ? 'Paso ' + n + ' de 5' : '¡Listo!';
+}
+
+function pick(el, sid, val) {
+  document.querySelectorAll('#' + sid + ' .opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  ans[sid] = val || el.querySelector('.opt-text').textContent;
+  const n = parseInt(sid.replace('s', ''));
+  const btn = document.getElementById('b' + n);
+  if (btn) btn.disabled = false;
+}
+
+function advance(n) {
+  if (n === 4 && ans['s4'] === 'no') {
+    show('s-no');
+    document.getElementById('pbar').style.width = '100%';
+    document.getElementById('slbl').textContent = '';
+    return;
+  }
+  show('s' + (n + 1));
+  setProgress(n + 1);
+}
+
+function chkContact() {
+  const ok = document.getElementById('fname').value.trim().length > 2 &&
+    document.getElementById('femail').value.includes('@') &&
+    document.getElementById('fphone').value.trim().length > 6;
+  document.getElementById('b5').disabled = !ok;
+}
+
+function goCalendar() {
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  const biz = ans['s1'] || '';
+  const challenge = document.getElementById('challenge').value.trim();
+
+  document.getElementById('ok-title').textContent = '¡Listo, ' + name.split(' ')[0] + '!';
+
+  const base = 'https://cal.com/matias-gironelli-calendario/llamada-de-diagnostico-god-agency';
+  const params = new URLSearchParams({
+    name: name,
+    email: email,
+    notes: 'WhatsApp: ' + phone + ' | Negocio: ' + biz + ' | Desafío: ' + challenge
+  });
+  document.getElementById('cal-link').href = base + '?' + params.toString();
+
+  show('s-ok');
+  document.getElementById('pbar').style.width = '100%';
+  document.getElementById('slbl').textContent = '¡Listo!';
+}
+</script>
+</body>
+</html>
